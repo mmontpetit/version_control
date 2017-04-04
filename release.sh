@@ -38,7 +38,7 @@ if [[ -n $1 ]]; then
     exit 113
 fi
 
-_json_file=$ext_json_file:package.json
+_json_file=${ext_json_file:-"package.json"}
 
 function git_status() {
   git status --porcelain 2> /dev/null
@@ -68,7 +68,7 @@ ensure_clean_git
 ensure_installed npm
 ensure_installed node
 ensure_installed jq
-cat "./${_json_file}"
+
 VERSION=$(node -e "console.log(require('./${_json_file}').version)")
 
 echo "Temporarily Disabling master branch required status checks"
