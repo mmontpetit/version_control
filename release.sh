@@ -68,8 +68,8 @@ ensure_clean_git
 ensure_installed npm
 ensure_installed node
 ensure_installed jq
-
-VERSION=$(node -e "console.log(require('./'+${_json_file}).version)")
+cat ./${_json_file}
+VERSION=$(node -e "console.log(require('./${_json_file}').version)")
 
 echo "Temporarily Disabling master branch required status checks"
 
