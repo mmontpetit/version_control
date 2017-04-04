@@ -14,6 +14,10 @@ do
 key="$1"
 
 case $key in
+    -j|--json)
+    ext_json_file="$2"
+    shift # past argument
+    ;;
     -t|--token)
     ext_token="$2"
     shift # past argument
@@ -34,7 +38,7 @@ if [[ -n $1 ]]; then
     exit 113
 fi
 
-REPO=${ext_repo}
+_json_file=$ext_json_file:"package.json"
 
 function git_status() {
   git status --porcelain 2> /dev/null
@@ -63,8 +67,9 @@ fi
 ensure_clean_git
 ensure_installed npm
 ensure_installed node
+ensure_installed jq
 
-VERSION=$(node -e "console.log(require('./package.json').version)")
+VERSION=$(node -e "console.log(require('./${ext_json_file}').version)")
 
 echo "Temporarily Disabling master branch required status checks"
 
