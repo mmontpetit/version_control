@@ -38,7 +38,7 @@ if [[ -n $1 ]]; then
     exit 113
 fi
 
-_json_file=$ext_json_file:"package.json"
+_json_file=$ext_json_file:package.json
 
 function git_status() {
   git status --porcelain 2> /dev/null
