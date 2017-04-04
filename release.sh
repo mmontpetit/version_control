@@ -14,8 +14,8 @@ do
 key="$1"
 
 case $key in
-    -v|--version)
-    VERSION="$2"
+    -t|--token)
+    ext_token="$2"
     shift # past argument
     ;;
     -r|--repo)
@@ -56,8 +56,8 @@ function ensure_installed() {
 }
 
 # some pre-flight checks
-if [ "$GITHUB_API_TOKEN" == "" ]; then
-  echo "No GITHUB_API_TOKEN found - this must be set!"
+if [ "${ext_token}" == "" ]; then
+  echo "No personal access token found"
   exit 1
 fi
 ensure_clean_git
@@ -68,12 +68,12 @@ VERSION=$(node -e "console.log(require('./package.json').version)")
 
 echo "Temporarily Disabling master branch required status checks"
 
-orig_state=$(curl "https://api.github.com/repos/$REPO/branches/master" \
-  -s -X GET -H "Authorization: token $GITHUB_API_TOKEN" \
+orig_state=$(curl "https://api.github.com/repos/${ext_repo}/branches/master" \
+  -s -X GET -H "Authorization: token ${ext_token}" \
   -H "Accept: application/vnd.github.loki-preview" | jq '{ protection: .protection }')
 disabled_state=$(echo $orig_state | jq '.protection.required_status_checks.enforcement_level="off"')
-patch_result=$(curl "https://api.github.com/repos/$REPO/branches/master" \
-  -s -X PATCH -H "Authorization: token $GITHUB_API_TOKEN" \
+patch_result=$(curl "https://api.github.com/repos/${ext_token}/branches/master" \
+  -s -X PATCH -H "Authorization: token ${ext_token}" \
   -H "Accept: application/vnd.github.loki-preview" \
   -d "${disabled_state}")
 
@@ -95,8 +95,8 @@ git tag -d $NEWVER
 git push
 
 echo "Re-enabling master branch required status checks..."
-patch_result=$(curl "https://api.github.com/repos/$REPO/branches/master" \
-  -s -X PATCH -H "Authorization: token $GITHUB_API_TOKEN" \
+patch_result=$(curl "https://api.github.com/repos/${ext_token}/branches/master" \
+  -s -X PATCH -H "Authorization: token ${ext_token}" \
   -H "Accept: application/vnd.github.loki-preview" \
   -d "${orig_state}")
 
